@@ -12,43 +12,43 @@ import java.util.List;
 import java.util.Optional;
 
 import com.swift.console.factory.FactoryManager;
-import com.swift.console.model.Categoria;
+import com.swift.console.model.TiposInvestimento;
 
-public class CategoriaDAO {
+public class TiposInvestimentoDAO {
 
     private FactoryManager factory;
     
-    public CategoriaDAO() {
+    public TiposInvestimentoDAO() {
         this.factory = FactoryManager.getInstance();
     }
 
-    public List<Categoria> findAll() throws SQLException {
-        String sql = "SELECT * FROM t_fin_categoria";
+    public List<TiposInvestimento> findAll() throws SQLException {
+        String sql = "SELECT * FROM t_fin_tipos_investimento";
         Connection conn = factory.getConnection();
         Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery(sql);
         
-        List<Categoria> categorias = new ArrayList<>();
+        List<TiposInvestimento> tipos = new ArrayList<>();
         while (rs.next()) {
-            categorias.add(mapResultSet(rs));
+            tipos.add(mapResultSet(rs));
         }
         
         rs.close();
         stmt.close();
         factory.closeConnection(conn);
         
-        return categorias;
+        return tipos;
     }
 
-    public Optional<Categoria> findById(Integer id) throws SQLException {
-        String sql = "SELECT * FROM t_fin_categoria WHERE cd_categoria = ?";
+    public Optional<TiposInvestimento> findById(Integer id) throws SQLException {
+        String sql = "SELECT * FROM t_fin_tipos_investimento WHERE cd_tipo = ?";
         Connection conn = factory.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql);
         
         stmt.setInt(1, id);
         ResultSet rs = stmt.executeQuery();
         
-        Optional<Categoria> result = rs.next() ? Optional.of(mapResultSet(rs)) : Optional.empty();
+        Optional<TiposInvestimento> result = rs.next() ? Optional.of(mapResultSet(rs)) : Optional.empty();
         
         rs.close();
         stmt.close();
@@ -57,29 +57,29 @@ public class CategoriaDAO {
         return result;
     }
 
-    public List<Categoria> findByTipo(String tipo) throws SQLException {
-        String sql = "SELECT * FROM t_fin_categoria WHERE tp_categoria = ?";
+    public List<TiposInvestimento> findByRisco(String risco) throws SQLException {
+        String sql = "SELECT * FROM t_fin_tipos_investimento WHERE risco = ?";
         Connection conn = factory.getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql);
         
-        stmt.setString(1, tipo);
+        stmt.setString(1, risco);
         ResultSet rs = stmt.executeQuery();
         
-        List<Categoria> categorias = new ArrayList<>();
+        List<TiposInvestimento> tipos = new ArrayList<>();
         while (rs.next()) {
-            categorias.add(mapResultSet(rs));
+            tipos.add(mapResultSet(rs));
         }
         
         rs.close();
         stmt.close();
         factory.closeConnection(conn);
         
-        return categorias;
+        return tipos;
     }
 
-    public Categoria save(Categoria categoria) throws SQLException {
-        String sql = "BEGIN INSERT INTO t_fin_categoria (cd_categoria, nm_categoria, tp_categoria) " +
-                     "VALUES (?, ?, ?) RETURNING cd_categoria INTO ?; END;";
+    public TiposInvestimento save(TiposInvestimento tipo) throws SQLException {
+        String sql = "BEGIN INSERT INTO t_fin_tipos_investimento (cd_tipo, risco, nm_tipo) " +
+                     "VALUES (?, ?, ?) RETURNING cd_tipo INTO ?; END;";
         Connection conn = factory.getConnection();
         CallableStatement stmt = conn.prepareCall(sql);
         
@@ -87,21 +87,21 @@ public class CategoriaDAO {
         Integer nextId = getNextId(conn);
         
         stmt.setInt(1, nextId);
-        stmt.setString(2, categoria.getNmCategoria());
-        stmt.setString(3, categoria.getTpCategoria());
+        stmt.setString(2, tipo.getRisco());
+        stmt.setString(3, tipo.getNmTipo());
         stmt.registerOutParameter(4, Types.NUMERIC);
         stmt.execute();
         
-        categoria.setCdCategoria(stmt.getInt(4));
+        tipo.setCdTipo(stmt.getInt(4));
         
         stmt.close();
         factory.closeConnection(conn);
         
-        return categoria;
+        return tipo;
     }
 
     private Integer getNextId(Connection conn) throws SQLException {
-        String sql = "SELECT NVL(MAX(cd_categoria), 0) + 1 FROM t_fin_categoria";
+        String sql = "SELECT NVL(MAX(cd_tipo), 0) + 1 FROM t_fin_tipos_investimento";
         Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery(sql);
         
@@ -115,11 +115,12 @@ public class CategoriaDAO {
         return nextId;
     }
 
-    private Categoria mapResultSet(ResultSet rs) throws SQLException {
-        Categoria categoria = new Categoria();
-        categoria.setCdCategoria(rs.getInt("cd_categoria"));
-        categoria.setNmCategoria(rs.getString("nm_categoria"));
-        categoria.setTpCategoria(rs.getString("tp_categoria"));
-        return categoria;
+    private TiposInvestimento mapResultSet(ResultSet rs) throws SQLException {
+        TiposInvestimento tipo = new TiposInvestimento();
+        tipo.setCdTipo(rs.getInt("cd_tipo"));
+        tipo.setRisco(rs.getString("risco"));
+        tipo.setNmTipo(rs.getString("nm_tipo"));
+        return tipo;
     }
 }
+

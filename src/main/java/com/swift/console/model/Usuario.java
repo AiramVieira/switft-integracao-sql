@@ -1,83 +1,97 @@
 package com.swift.console.model;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 public class Usuario {
-    private Integer id;
-    private String nome;
-    private String sobrenome;
-    private Integer enderecoId;
-    private String telephone;
-    private String tipo;
+    private Integer cdUsuario;
+    private Integer cdAutenticacao;
+    private String nmUsuario;
+    private Date dtNascimento;
+    private String nrTelefone;
+    private String ativo;
+    private BigDecimal vlSaldo;
 
     public Usuario() {
     }
 
-    public Usuario(Integer id, String nome, String sobrenome, Integer enderecoId, String telephone, String tipo) {
-        this.id = id;
-        this.nome = nome;
-        this.sobrenome = sobrenome;
-        this.enderecoId = enderecoId;
-        this.telephone = telephone;
-        this.tipo = tipo;
+    public Usuario(Integer cdUsuario, Integer cdAutenticacao, String nmUsuario, Date dtNascimento, 
+                   String nrTelefone, String ativo, BigDecimal vlSaldo) {
+        this.cdUsuario = cdUsuario;
+        this.cdAutenticacao = cdAutenticacao;
+        this.nmUsuario = nmUsuario;
+        this.dtNascimento = dtNascimento;
+        this.nrTelefone = nrTelefone;
+        this.ativo = ativo;
+        this.vlSaldo = vlSaldo;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getCdUsuario() {
+        return cdUsuario;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setCdUsuario(Integer cdUsuario) {
+        this.cdUsuario = cdUsuario;
     }
 
-    public String getNome() {
-        return nome;
+    public Integer getCdAutenticacao() {
+        return cdAutenticacao;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setCdAutenticacao(Integer cdAutenticacao) {
+        this.cdAutenticacao = cdAutenticacao;
     }
 
-    public String getSobrenome() {
-        return sobrenome;
+    public String getNmUsuario() {
+        return nmUsuario;
     }
 
-    public void setSobrenome(String sobrenome) {
-        this.sobrenome = sobrenome;
+    public void setNmUsuario(String nmUsuario) {
+        this.nmUsuario = nmUsuario;
     }
 
-    public Integer getEnderecoId() {
-        return enderecoId;
+    public Date getDtNascimento() {
+        return dtNascimento;
     }
 
-    public void setEnderecoId(Integer enderecoId) {
-        this.enderecoId = enderecoId;
+    public void setDtNascimento(Date dtNascimento) {
+        this.dtNascimento = dtNascimento;
     }
 
-    public String getTelephone() {
-        return telephone;
+    public String getNrTelefone() {
+        return nrTelefone;
     }
 
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
+    public void setNrTelefone(String nrTelefone) {
+        this.nrTelefone = nrTelefone;
     }
 
-    public String getTipo() {
-        return tipo;
+    public String getAtivo() {
+        return ativo;
     }
 
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
+    public void setAtivo(String ativo) {
+        this.ativo = ativo;
+    }
+
+    public BigDecimal getVlSaldo() {
+        return vlSaldo;
+    }
+
+    public void setVlSaldo(BigDecimal vlSaldo) {
+        this.vlSaldo = vlSaldo;
     }
 
     @Override
     public String toString() {
         return "Usuario{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", sobrenome='" + sobrenome + '\'' +
-                ", enderecoId=" + enderecoId +
-                ", telephone='" + telephone + '\'' +
-                ", tipo='" + tipo + '\'' +
+                "cdUsuario=" + cdUsuario +
+                ", cdAutenticacao=" + cdAutenticacao +
+                ", nmUsuario='" + nmUsuario + '\'' +
+                ", dtNascimento=" + dtNascimento +
+                ", nrTelefone='" + nrTelefone + '\'' +
+                ", ativo='" + ativo + '\'' +
+                ", vlSaldo=" + vlSaldo +
                 '}';
     }
 }
-

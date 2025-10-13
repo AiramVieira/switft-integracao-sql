@@ -1,7 +1,13 @@
 package com.swift.console.model;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 class UsuarioTest {
 
@@ -9,67 +15,57 @@ class UsuarioTest {
     void testCriarUsuarioVazio() {
         Usuario usuario = new Usuario();
         assertNotNull(usuario);
-        assertNull(usuario.getId());
-        assertNull(usuario.getNome());
-        assertNull(usuario.getSobrenome());
+        assertNull(usuario.getCdUsuario());
+        assertNull(usuario.getNmUsuario());
     }
 
     @Test
     void testCriarUsuarioComParametros() {
-        Usuario usuario = new Usuario(1, "João", "Silva", 10, "11999999999", "PF");
-        assertEquals(1, usuario.getId());
-        assertEquals("João", usuario.getNome());
-        assertEquals("Silva", usuario.getSobrenome());
-        assertEquals(10, usuario.getEnderecoId());
-        assertEquals("11999999999", usuario.getTelephone());
-        assertEquals("PF", usuario.getTipo());
+        Date data = new Date();
+        BigDecimal saldo = new BigDecimal("1000.00");
+        Usuario usuario = new Usuario(1, 5, "João Silva", data, "11999999999", "S", saldo);
+        
+        assertEquals(1, usuario.getCdUsuario());
+        assertEquals(5, usuario.getCdAutenticacao());
+        assertEquals("João Silva", usuario.getNmUsuario());
+        assertEquals(data, usuario.getDtNascimento());
+        assertEquals("11999999999", usuario.getNrTelefone());
+        assertEquals("S", usuario.getAtivo());
+        assertEquals(saldo, usuario.getVlSaldo());
     }
 
     @Test
     void testSettersAndGetters() {
         Usuario usuario = new Usuario();
-        usuario.setId(5);
-        usuario.setNome("Maria");
-        usuario.setSobrenome("Oliveira");
-        usuario.setEnderecoId(20);
-        usuario.setTelephone("11888888888");
-        usuario.setTipo("PJ");
+        Date data = new Date();
+        BigDecimal saldo = new BigDecimal("500.00");
         
-        assertEquals(5, usuario.getId());
-        assertEquals("Maria", usuario.getNome());
-        assertEquals("Oliveira", usuario.getSobrenome());
-        assertEquals(20, usuario.getEnderecoId());
-        assertEquals("11888888888", usuario.getTelephone());
-        assertEquals("PJ", usuario.getTipo());
-    }
-
-    @Test
-    void testNomeCompleto() {
-        Usuario usuario = new Usuario(1, "Carlos", "Santos", null, "11777777777", "PF");
-        String nomeCompleto = usuario.getNome() + " " + usuario.getSobrenome();
-        assertEquals("Carlos Santos", nomeCompleto);
-    }
-
-    @Test
-    void testTipoPessoaFisica() {
-        Usuario usuario = new Usuario();
-        usuario.setTipo("PF");
-        assertEquals("PF", usuario.getTipo());
-    }
-
-    @Test
-    void testTipoPessoaJuridica() {
-        Usuario usuario = new Usuario();
-        usuario.setTipo("PJ");
-        assertEquals("PJ", usuario.getTipo());
+        usuario.setCdUsuario(10);
+        usuario.setCdAutenticacao(15);
+        usuario.setNmUsuario("Maria Santos");
+        usuario.setDtNascimento(data);
+        usuario.setNrTelefone("11988888888");
+        usuario.setAtivo("N");
+        usuario.setVlSaldo(saldo);
+        
+        assertEquals(10, usuario.getCdUsuario());
+        assertEquals(15, usuario.getCdAutenticacao());
+        assertEquals("Maria Santos", usuario.getNmUsuario());
+        assertEquals(data, usuario.getDtNascimento());
+        assertEquals("11988888888", usuario.getNrTelefone());
+        assertEquals("N", usuario.getAtivo());
+        assertEquals(saldo, usuario.getVlSaldo());
     }
 
     @Test
     void testToString() {
-        Usuario usuario = new Usuario(1, "Ana", "Costa", 5, "11666666666", "PF");
+        Date data = new Date();
+        BigDecimal saldo = new BigDecimal("2000.00");
+        Usuario usuario = new Usuario(1, 5, "Pedro Oliveira", data, "11977777777", "S", saldo);
         String result = usuario.toString();
-        assertTrue(result.contains("Ana"));
-        assertTrue(result.contains("Costa"));
+        
+        assertTrue(result.contains("cdUsuario=1"));
+        assertTrue(result.contains("nmUsuario='Pedro Oliveira'"));
+        assertTrue(result.contains("ativo='S'"));
     }
 }
-

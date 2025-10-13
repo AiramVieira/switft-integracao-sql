@@ -12,15 +12,13 @@ public class FactoryManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(FactoryManager.class);
     
-    private static final String URL = "jdbc:oracle:thin:@localhost:1521:XE";
-    private static final String USERNAME = "system";
-    private static final String PASSWORD = "oracle";
+    private static final String URL = "jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl";
+    private static final String USERNAME = "rm564323";
+    private static final String PASSWORD = "111199";
     
     private static FactoryManager instance;
     
-    private FactoryManager() {
-        // Singleton
-    }
+    private FactoryManager() { }
     
     public static FactoryManager getInstance() {
         if (instance == null) {

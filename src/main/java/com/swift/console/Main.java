@@ -1,25 +1,36 @@
 package com.swift.console;
 
-import com.swift.console.dao.*;
-import com.swift.console.model.*;
-
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
+import com.swift.console.dao.AutenticacaoDAO;
+import com.swift.console.dao.CategoriaDAO;
+import com.swift.console.dao.GastosDAO;
+import com.swift.console.dao.UsuarioDAO;
+import com.swift.console.model.Autenticacao;
+import com.swift.console.model.Categoria;
+import com.swift.console.model.Gastos;
+import com.swift.console.model.Usuario;
+
 public class Main {
     
-    private static Scanner scanner = new Scanner(System.in);
-    private static CategoriaDAO categoriaDAO = new CategoriaDAO();
-    private static ProductDAO productDAO = new ProductDAO();
-    private static UsuarioDAO usuarioDAO = new UsuarioDAO();
-    private static EnderecoDAO enderecoDAO = new EnderecoDAO();
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    
+    private static final AutenticacaoDAO autenticacaoDAO = new AutenticacaoDAO();
+    private static final UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private static final CategoriaDAO categoriaDAO = new CategoriaDAO();
+    private static final GastosDAO gastosDAO = new GastosDAO();
 
     public static void main(String[] args) {
         System.out.println("===========================================");
-        System.out.println("  SISTEMA DE GERENCIAMENTO - SWIFT APP");
+        System.out.println("  SISTEMA FINANCEIRO - SWIFT APP");
         System.out.println("===========================================\n");
 
         boolean running = true;
@@ -31,16 +42,16 @@ public class Main {
                 
                 switch (opcao) {
                     case 1:
-                        gerenciarCategorias();
-                        break;
-                    case 2:
-                        gerenciarProdutos();
-                        break;
-                    case 3:
                         gerenciarUsuarios();
                         break;
+                    case 2:
+                        gerenciarAutenticacao();
+                        break;
+                    case 3:
+                        gerenciarCategorias();
+                        break;
                     case 4:
-                        gerenciarEnderecos();
+                        gerenciarGastos();
                         break;
                     case 0:
                         System.out.println("\nEncerrando sistema...");
@@ -61,206 +72,21 @@ public class Main {
 
     private static void exibirMenuPrincipal() {
         System.out.println("\n========== MENU PRINCIPAL ==========");
-        System.out.println("1. Gerenciar Categorias");
-        System.out.println("2. Gerenciar Produtos");
-        System.out.println("3. Gerenciar Usuários");
-        System.out.println("4. Gerenciar Endereços");
+        System.out.println("1. Gerenciar Usuários");
+        System.out.println("2. Gerenciar Autenticação");
+        System.out.println("3. Gerenciar Categorias");
+        System.out.println("4. Gerenciar Gastos");
         System.out.println("0. Sair");
         System.out.println("====================================");
     }
 
-    private static void exibirMenuCRUD() {
+    private static void exibirMenuCRUD(Boolean esconderEscolha) {
         System.out.println("\n1. Inserir novo registro");
         System.out.println("2. Buscar por ID");
         System.out.println("3. Listar todos");
-        System.out.println("0. Voltar");
-        System.out.print("Escolha: ");
-    }
-
-    // ==================== CATEGORIAS ====================
-    
-    private static void gerenciarCategorias() throws SQLException {
-        System.out.println("\n========== GERENCIAR CATEGORIAS ==========");
-        exibirMenuCRUD();
-        int opcao = scanner.nextInt();
-        scanner.nextLine(); // limpar buffer
-
-        switch (opcao) {
-            case 1:
-                inserirCategoria();
-                break;
-            case 2:
-                buscarCategoriaPorId();
-                break;
-            case 3:
-                listarCategorias();
-                break;
-            case 0:
-                return;
-            default:
-                System.out.println("❌ Opção inválida!");
-        }
-    }
-
-    private static void inserirCategoria() throws SQLException {
-        System.out.println("\n--- INSERIR CATEGORIA ---");
-        System.out.print("Descrição: ");
-        String descricao = scanner.nextLine();
-
-        Categoria categoria = new Categoria();
-        categoria.setDescricao(descricao);
-
-        Categoria salva = categoriaDAO.save(categoria);
-        System.out.println("✅ Categoria inserida com sucesso! ID: " + salva.getId());
-        System.out.println(salva);
-    }
-
-    private static void buscarCategoriaPorId() throws SQLException {
-        System.out.println("\n--- BUSCAR CATEGORIA ---");
-        int id = lerInt("ID da categoria: ");
-
-        Optional<Categoria> categoria = categoriaDAO.findById(id);
-        if (categoria.isPresent()) {
-            System.out.println("✅ Categoria encontrada:");
-            System.out.println(categoria.get());
-        } else {
-            System.out.println("❌ Categoria não encontrada!");
-        }
-    }
-
-    private static void listarCategorias() throws SQLException {
-        System.out.println("\n--- LISTA DE CATEGORIAS ---");
-        List<Categoria> categorias = categoriaDAO.findAll();
-        
-        if (categorias.isEmpty()) {
-            System.out.println("Nenhuma categoria cadastrada.");
-        } else {
-            categorias.forEach(System.out::println);
-        }
-    }
-
-    // ==================== PRODUTOS ====================
-    
-    private static void gerenciarProdutos() throws SQLException {
-        System.out.println("\n========== GERENCIAR PRODUTOS ==========");
-        exibirMenuCRUD();
-        System.out.println("4. Buscar por nome");
-        System.out.println("5. Buscar por categoria");
-        System.out.print("Escolha: ");
-        int opcao = scanner.nextInt();
-        scanner.nextLine();
-
-        switch (opcao) {
-            case 1:
-                inserirProduto();
-                break;
-            case 2:
-                buscarProdutoPorId();
-                break;
-            case 3:
-                listarProdutos();
-                break;
-            case 4:
-                buscarProdutoPorNome();
-                break;
-            case 5:
-                buscarProdutoPorCategoria();
-                break;
-            case 0:
-                return;
-            default:
-                System.out.println("❌ Opção inválida!");
-        }
-    }
-
-    private static void inserirProduto() throws SQLException {
-        System.out.println("\n--- INSERIR PRODUTO ---");
-        
-        System.out.print("Nome: ");
-        String nome = scanner.nextLine();
-        
-        int categoriaId = lerInt("ID da Categoria: ");
-        float preco = lerFloat("Preço: ");
-        
-        System.out.print("Promoção (0 ou 1, Enter para nulo): ");
-        String promocaoStr = scanner.nextLine();
-        Integer promocao = promocaoStr.isEmpty() ? null : Integer.parseInt(promocaoStr);
-        
-        int estoque = lerInt("Estoque: ");
-        
-        System.out.print("Imagem (URL): ");
-        String imagem = scanner.nextLine();
-        
-        System.out.print("Descrição: ");
-        String descricao = scanner.nextLine();
-        
-        System.out.print("Desconto (%, Enter para nulo): ");
-        String descontoStr = scanner.nextLine();
-        Integer desconto = descontoStr.isEmpty() ? null : Integer.parseInt(descontoStr);
-
-        Product product = new Product();
-        product.setNome(nome);
-        product.setCategoriaId(categoriaId);
-        product.setPreco(preco);
-        product.setPromocao(promocao);
-        product.setEstoque(estoque);
-        product.setImagem(imagem);
-        product.setDescricao(descricao);
-        product.setDesconto(desconto);
-
-        Product salvo = productDAO.save(product);
-        System.out.println("✅ Produto inserido com sucesso! ID: " + salvo.getId());
-        System.out.println(salvo);
-    }
-
-    private static void buscarProdutoPorId() throws SQLException {
-        System.out.println("\n--- BUSCAR PRODUTO ---");
-        int id = lerInt("ID do produto: ");
-
-        Optional<Product> product = productDAO.findById(id);
-        if (product.isPresent()) {
-            System.out.println("✅ Produto encontrado:");
-            System.out.println(product.get());
-        } else {
-            System.out.println("❌ Produto não encontrado!");
-        }
-    }
-
-    private static void listarProdutos() throws SQLException {
-        System.out.println("\n--- LISTA DE PRODUTOS ---");
-        List<Product> products = productDAO.findAll();
-        
-        if (products.isEmpty()) {
-            System.out.println("Nenhum produto cadastrado.");
-        } else {
-            products.forEach(System.out::println);
-        }
-    }
-
-    private static void buscarProdutoPorNome() throws SQLException {
-        System.out.println("\n--- BUSCAR PRODUTO POR NOME ---");
-        System.out.print("Nome (parcial): ");
-        String nome = scanner.nextLine();
-
-        List<Product> products = productDAO.searchByNome(nome);
-        if (products.isEmpty()) {
-            System.out.println("❌ Nenhum produto encontrado!");
-        } else {
-            System.out.println("✅ Produtos encontrados:");
-            products.forEach(System.out::println);
-        }
-    }
-
-    private static void buscarProdutoPorCategoria() throws SQLException {
-        System.out.println("\n--- BUSCAR PRODUTOS POR CATEGORIA ---");
-        int categoriaId = lerInt("ID da categoria: ");
-
-        List<Product> products = productDAO.findByCategoria(categoriaId);
-        if (products.isEmpty()) {
-            System.out.println("❌ Nenhum produto encontrado!");
-        } else {
-            System.out.println("✅ Produtos encontrados:");
-            products.forEach(System.out::println);
+        if (!esconderEscolha) {
+            System.out.println("0. Voltar");
+            System.out.print("Escolha: ");
         }
     }
 
@@ -268,9 +94,9 @@ public class Main {
     
     private static void gerenciarUsuarios() throws SQLException {
         System.out.println("\n========== GERENCIAR USUÁRIOS ==========");
-        exibirMenuCRUD();
+        exibirMenuCRUD(false);
         int opcao = scanner.nextInt();
-        scanner.nextLine(); // limpar buffer
+        scanner.nextLine();
 
         switch (opcao) {
             case 1:
@@ -292,31 +118,28 @@ public class Main {
     private static void inserirUsuario() throws SQLException {
         System.out.println("\n--- INSERIR USUÁRIO ---");
         
-        System.out.print("Nome: ");
+        System.out.print("Nome completo: ");
         String nome = scanner.nextLine();
         
-        System.out.print("Sobrenome: ");
-        String sobrenome = scanner.nextLine();
-        
-        System.out.print("ID do Endereço (Enter para nulo): ");
-        String enderecoStr = scanner.nextLine();
-        Integer enderecoId = enderecoStr.isEmpty() ? null : Integer.parseInt(enderecoStr);
+        Date dataNascimento = lerData("Data de Nascimento (dd/MM/yyyy): ");
         
         System.out.print("Telefone: ");
-        String telephone = scanner.nextLine();
+        String telefone = scanner.nextLine();
         
-        System.out.print("Tipo (PF/PJ): ");
-        String tipo = scanner.nextLine();
+        System.out.print("Ativo (S/N): ");
+        String ativo = scanner.nextLine().toUpperCase();
+        
+        BigDecimal saldo = lerBigDecimal("Saldo inicial: ");
 
         Usuario usuario = new Usuario();
-        usuario.setNome(nome);
-        usuario.setSobrenome(sobrenome);
-        usuario.setEnderecoId(enderecoId);
-        usuario.setTelephone(telephone);
-        usuario.setTipo(tipo);
+        usuario.setNmUsuario(nome);
+        usuario.setDtNascimento(dataNascimento);
+        usuario.setNrTelefone(telefone);
+        usuario.setAtivo(ativo);
+        usuario.setVlSaldo(saldo);
 
         Usuario salvo = usuarioDAO.save(usuario);
-        System.out.println("✅ Usuário inserido com sucesso! ID: " + salvo.getId());
+        System.out.println("✅ Usuário inserido com sucesso! ID: " + salvo.getCdUsuario());
         System.out.println(salvo);
     }
 
@@ -344,23 +167,23 @@ public class Main {
         }
     }
 
-    // ==================== ENDEREÇOS ====================
+    // ==================== CATEGORIAS ====================
     
-    private static void gerenciarEnderecos() throws SQLException {
-        System.out.println("\n========== GERENCIAR ENDEREÇOS ==========");
-        exibirMenuCRUD();
+    private static void gerenciarCategorias() throws SQLException {
+        System.out.println("\n========== GERENCIAR CATEGORIAS ==========");
+        exibirMenuCRUD(false);
         int opcao = scanner.nextInt();
-        scanner.nextLine(); // limpar buffer
+        scanner.nextLine();
 
         switch (opcao) {
             case 1:
-                inserirEndereco();
+                inserirCategoria();
                 break;
             case 2:
-                buscarEnderecoPorId();
+                buscarCategoriaPorId();
                 break;
             case 3:
-                listarEnderecos();
+                listarCategorias();
                 break;
             case 0:
                 return;
@@ -369,53 +192,252 @@ public class Main {
         }
     }
 
-    private static void inserirEndereco() throws SQLException {
-        System.out.println("\n--- INSERIR ENDEREÇO ---");
+    private static void inserirCategoria() throws SQLException {
+        System.out.println("\n--- INSERIR CATEGORIA ---");
         
-        System.out.print("Descrição: ");
-        String descricao = scanner.nextLine();
+        System.out.print("Nome da categoria: ");
+        String nome = scanner.nextLine();
         
-        System.out.print("CEP: ");
-        String cep = scanner.nextLine();
-        
-        System.out.print("Latitude: ");
-        BigDecimal latitude = new BigDecimal(scanner.nextLine());
-        
-        System.out.print("Longitude: ");
-        BigDecimal longitude = new BigDecimal(scanner.nextLine());
+        System.out.print("Tipo (R=Receita, D=Despesa): ");
+        String tipo = scanner.nextLine().toUpperCase();
 
-        Endereco endereco = new Endereco();
-        endereco.setDescricao(descricao);
-        endereco.setCep(cep);
-        endereco.setLatitude(latitude);
-        endereco.setLongitude(longitude);
+        Categoria categoria = new Categoria();
+        categoria.setNmCategoria(nome);
+        categoria.setTpCategoria(tipo);
 
-        Endereco salvo = enderecoDAO.save(endereco);
-        System.out.println("✅ Endereço inserido com sucesso! ID: " + salvo.getId());
-        System.out.println(salvo);
+        Categoria salva = categoriaDAO.save(categoria);
+        System.out.println("✅ Categoria inserida com sucesso! ID: " + salva.getCdCategoria());
+        System.out.println(salva);
     }
 
-    private static void buscarEnderecoPorId() throws SQLException {
-        System.out.println("\n--- BUSCAR ENDEREÇO ---");
-        int id = lerInt("ID do endereço: ");
+    private static void buscarCategoriaPorId() throws SQLException {
+        System.out.println("\n--- BUSCAR CATEGORIA ---");
+        int id = lerInt("ID da categoria: ");
 
-        Optional<Endereco> endereco = enderecoDAO.findById(id);
-        if (endereco.isPresent()) {
-            System.out.println("✅ Endereço encontrado:");
-            System.out.println(endereco.get());
+        Optional<Categoria> categoria = categoriaDAO.findById(id);
+        if (categoria.isPresent()) {
+            System.out.println("✅ Categoria encontrada:");
+            System.out.println(categoria.get());
         } else {
-            System.out.println("❌ Endereço não encontrado!");
+            System.out.println("❌ Categoria não encontrada!");
         }
     }
 
-    private static void listarEnderecos() throws SQLException {
-        System.out.println("\n--- LISTA DE ENDEREÇOS ---");
-        List<Endereco> enderecos = enderecoDAO.findAll();
+    private static void listarCategorias() throws SQLException {
+        System.out.println("\n--- LISTA DE CATEGORIAS ---");
+        List<Categoria> categorias = categoriaDAO.findAll();
         
-        if (enderecos.isEmpty()) {
-            System.out.println("Nenhum endereço cadastrado.");
+        if (categorias.isEmpty()) {
+            System.out.println("Nenhuma categoria cadastrada.");
         } else {
-            enderecos.forEach(System.out::println);
+            categorias.forEach(System.out::println);
+        }
+    }
+
+    // ==================== GASTOS ====================
+    
+    private static void gerenciarGastos() throws SQLException {
+        System.out.println("\n========== GERENCIAR GASTOS ==========");
+        exibirMenuCRUD(true);
+        System.out.println("4. Buscar por usuário");
+        System.out.println("5. Buscar por categoria");
+        System.out.println("0. Voltar");
+        System.out.print("Escolha: ");
+        int opcao = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (opcao) {
+            case 1:
+                inserirGasto();
+                break;
+            case 2:
+                buscarGastoPorId();
+                break;
+            case 3:
+                listarGastos();
+                break;
+            case 4:
+                buscarGastosPorUsuario();
+                break;
+            case 5:
+                buscarGastosPorCategoria();
+                break;
+            case 0:
+                return;
+            default:
+                System.out.println("❌ Opção inválida!");
+        }
+    }
+
+    private static void inserirGasto() throws SQLException {
+        System.out.println("\n--- INSERIR GASTO ---");
+        
+        int cdUsuario = lerInt("ID do Usuário: ");
+        int cdCategoria = lerInt("ID da Categoria: ");
+        
+        System.out.print("Nome do gasto: ");
+        String nome = scanner.nextLine();
+        
+        Date dataGasto = lerData("Data do gasto (dd/MM/yyyy): ");
+        BigDecimal valor = lerBigDecimal("Valor: ");
+        
+        System.out.print("Descrição: ");
+        String descricao = scanner.nextLine();
+
+        Gastos gasto = new Gastos();
+        gasto.setCdUsuario(cdUsuario);
+        gasto.setCdCategoria(cdCategoria);
+        gasto.setNmGasto(nome);
+        gasto.setDtGasto(dataGasto);
+        gasto.setVlGasto(valor);
+        gasto.setDsGasto(descricao);
+
+        Gastos salvo = gastosDAO.save(gasto);
+        System.out.println("✅ Gasto inserido com sucesso! ID: " + salvo.getCdGasto());
+        System.out.println(salvo);
+    }
+
+    private static void buscarGastoPorId() throws SQLException {
+        System.out.println("\n--- BUSCAR GASTO ---");
+        int id = lerInt("ID do gasto: ");
+
+        Optional<Gastos> gasto = gastosDAO.findById(id);
+        if (gasto.isPresent()) {
+            System.out.println("✅ Gasto encontrado:");
+            System.out.println(gasto.get());
+        } else {
+            System.out.println("❌ Gasto não encontrado!");
+        }
+    }
+
+    private static void listarGastos() throws SQLException {
+        System.out.println("\n--- LISTA DE GASTOS ---");
+        List<Gastos> gastos = gastosDAO.findAll();
+        
+        if (gastos.isEmpty()) {
+            System.out.println("Nenhum gasto cadastrado.");
+        } else {
+            gastos.forEach(System.out::println);
+        }
+    }
+
+    private static void buscarGastosPorUsuario() throws SQLException {
+        System.out.println("\n--- BUSCAR GASTOS POR USUÁRIO ---");
+        int cdUsuario = lerInt("ID do usuário: ");
+
+        List<Gastos> gastos = gastosDAO.findByUsuario(cdUsuario);
+        if (gastos.isEmpty()) {
+            System.out.println("❌ Nenhum gasto encontrado!");
+        } else {
+            System.out.println("✅ Gastos encontrados:");
+            gastos.forEach(System.out::println);
+        }
+    }
+
+    private static void buscarGastosPorCategoria() throws SQLException {
+        System.out.println("\n--- BUSCAR GASTOS POR CATEGORIA ---");
+        int cdCategoria = lerInt("ID da categoria: ");
+
+        List<Gastos> gastos = gastosDAO.findByCategoria(cdCategoria);
+        if (gastos.isEmpty()) {
+            System.out.println("❌ Nenhum gasto encontrado!");
+        } else {
+            System.out.println("✅ Gastos encontrados:");
+            gastos.forEach(System.out::println);
+        }
+    }
+
+    // ==================== AUTENTICAÇÃO ====================
+    
+    private static void gerenciarAutenticacao() throws SQLException {
+        System.out.println("\n========== GERENCIAR AUTENTICAÇÃO ==========");
+        exibirMenuCRUD(true);
+        System.out.println("4. Buscar por email");
+        System.out.println("0. Voltar");
+        System.out.print("Escolha: ");
+        int opcao = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (opcao) {
+            case 1:
+                inserirAutenticacao();
+                break;
+            case 2:
+                buscarAutenticacaoPorId();
+                break;
+            case 3:
+                listarAutenticacoes();
+                break;
+            case 4:
+                buscarAutenticacaoPorEmail();
+                break;
+            case 0:
+                return;
+            default:
+                System.out.println("❌ Opção inválida!");
+        }
+    }
+
+    private static void inserirAutenticacao() throws SQLException {
+        System.out.println("\n--- INSERIR AUTENTICAÇÃO ---");
+        
+        int cdUsuario = lerInt("ID do Usuário: ");
+        
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+        
+        System.out.print("Senha: ");
+        String senha = scanner.nextLine();
+        
+        System.out.print("Status da conta: ");
+        String status = scanner.nextLine();
+
+        Autenticacao autenticacao = new Autenticacao();
+        autenticacao.setCdUsuario(cdUsuario);
+        autenticacao.setEmail(email);
+        autenticacao.setSenha(senha);
+        autenticacao.setStatusConta(status);
+
+        Autenticacao salva = autenticacaoDAO.save(autenticacao);
+        System.out.println("✅ Autenticação inserida com sucesso! ID: " + salva.getCdAutenticacao());
+        System.out.println(salva);
+    }
+
+    private static void buscarAutenticacaoPorId() throws SQLException {
+        System.out.println("\n--- BUSCAR AUTENTICAÇÃO ---");
+        int id = lerInt("ID da autenticação: ");
+
+        Optional<Autenticacao> autenticacao = autenticacaoDAO.findById(id);
+        if (autenticacao.isPresent()) {
+            System.out.println("✅ Autenticação encontrada:");
+            System.out.println(autenticacao.get());
+        } else {
+            System.out.println("❌ Autenticação não encontrada!");
+        }
+    }
+
+    private static void listarAutenticacoes() throws SQLException {
+        System.out.println("\n--- LISTA DE AUTENTICAÇÕES ---");
+        List<Autenticacao> autenticacoes = autenticacaoDAO.findAll();
+        
+        if (autenticacoes.isEmpty()) {
+            System.out.println("Nenhuma autenticação cadastrada.");
+        } else {
+            autenticacoes.forEach(System.out::println);
+        }
+    }
+
+    private static void buscarAutenticacaoPorEmail() throws SQLException {
+        System.out.println("\n--- BUSCAR AUTENTICAÇÃO POR EMAIL ---");
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+
+        Optional<Autenticacao> autenticacao = autenticacaoDAO.findByEmail(email);
+        if (autenticacao.isPresent()) {
+            System.out.println("✅ Autenticação encontrada:");
+            System.out.println(autenticacao.get());
+        } else {
+            System.out.println("❌ Autenticação não encontrada!");
         }
     }
 
@@ -424,15 +446,29 @@ public class Main {
     private static int lerInt(String mensagem) {
         System.out.print(mensagem);
         int valor = scanner.nextInt();
-        scanner.nextLine(); // limpar buffer
+        scanner.nextLine();
         return valor;
     }
 
-    private static float lerFloat(String mensagem) {
+    private static BigDecimal lerBigDecimal(String mensagem) {
         System.out.print(mensagem);
-        float valor = scanner.nextFloat();
-        scanner.nextLine(); // limpar buffer
+        BigDecimal valor = scanner.nextBigDecimal();
+        scanner.nextLine();
         return valor;
+    }
+
+    private static Date lerData(String mensagem) {
+        System.out.print(mensagem);
+        String dataStr = scanner.nextLine();
+        return lerDataFromString(dataStr);
+    }
+
+    private static Date lerDataFromString(String dataStr) {
+        try {
+            return dateFormat.parse(dataStr);
+        } catch (ParseException e) {
+            System.err.println("Formato de data inválido! Usando data atual.");
+            return new Date();
+        }
     }
 }
-

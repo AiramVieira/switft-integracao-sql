@@ -80,19 +80,21 @@ public class Main {
         System.out.println("====================================");
     }
 
-    private static void exibirMenuCRUD() {
+    private static void exibirMenuCRUD(Boolean esconderEscolha) {
         System.out.println("\n1. Inserir novo registro");
         System.out.println("2. Buscar por ID");
         System.out.println("3. Listar todos");
-        System.out.println("0. Voltar");
-        System.out.print("Escolha: ");
+        if (!esconderEscolha) {
+            System.out.println("0. Voltar");
+            System.out.print("Escolha: ");
+        }
     }
 
     // ==================== USUÁRIOS ====================
     
     private static void gerenciarUsuarios() throws SQLException {
         System.out.println("\n========== GERENCIAR USUÁRIOS ==========");
-        exibirMenuCRUD();
+        exibirMenuCRUD(false);
         int opcao = scanner.nextInt();
         scanner.nextLine();
 
@@ -169,7 +171,7 @@ public class Main {
     
     private static void gerenciarCategorias() throws SQLException {
         System.out.println("\n========== GERENCIAR CATEGORIAS ==========");
-        exibirMenuCRUD();
+        exibirMenuCRUD(false);
         int opcao = scanner.nextInt();
         scanner.nextLine();
 
@@ -236,9 +238,10 @@ public class Main {
     
     private static void gerenciarGastos() throws SQLException {
         System.out.println("\n========== GERENCIAR GASTOS ==========");
-        exibirMenuCRUD();
+        exibirMenuCRUD(true);
         System.out.println("4. Buscar por usuário");
         System.out.println("5. Buscar por categoria");
+        System.out.println("0. Voltar");
         System.out.print("Escolha: ");
         int opcao = scanner.nextInt();
         scanner.nextLine();
@@ -348,8 +351,9 @@ public class Main {
     
     private static void gerenciarAutenticacao() throws SQLException {
         System.out.println("\n========== GERENCIAR AUTENTICAÇÃO ==========");
-        exibirMenuCRUD();
+        exibirMenuCRUD(true);
         System.out.println("4. Buscar por email");
+        System.out.println("0. Voltar");
         System.out.print("Escolha: ");
         int opcao = scanner.nextInt();
         scanner.nextLine();
